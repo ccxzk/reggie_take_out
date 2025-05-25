@@ -2,6 +2,7 @@ package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.itheima.reggie.common.R;
+import com.itheima.reggie.constant.OperationType;
 import com.itheima.reggie.dto.EmployeeDTO;
 import com.itheima.reggie.entity.Employee;
 import com.itheima.reggie.service.EmployeeService;
@@ -79,10 +80,9 @@ public class EmployeeController {
         //设置初始密码123456，并进行md5加密处理
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
 
-        //插入
+        //新增员工
+        employeeService.save(employee);
 
-
-
-
+        return R.success("新增员工成功");
     }
 }
