@@ -6,8 +6,8 @@ import lombok.Data;
 public class EmployeePageQueryDTO {
     String name;
 
-    String page;
+    Long page;
 
-    String pageSize;
+    Long pageSize;
 
 }

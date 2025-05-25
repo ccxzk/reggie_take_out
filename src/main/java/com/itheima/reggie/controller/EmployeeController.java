@@ -1,6 +1,7 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.constant.MessageConstant;
 import com.itheima.reggie.constant.OperationType;
@@ -9,13 +10,11 @@ import com.itheima.reggie.dto.EmployeePageQueryDTO;
 import com.itheima.reggie.entity.Employee;
 import com.itheima.reggie.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -97,9 +96,56 @@ public class EmployeeController {
         return R.success("新增员工成功");
     }
 
-    @PostMapping("/page")
-    public R page(@RequestBody EmployeePageQueryDTO employeePageQueryDTO){
+    /**
+     * 员工分页查询
+     * @param employeePageQueryDTO
+     * @return
+     */
+    @GetMapping("/page")
+    public R page(EmployeePageQueryDTO employeePageQueryDTO){
+        //构造分页构造器
+        Page page = new Page(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
 
-        return R.success("");
+        //构造条件构造器
+        LambdaQueryWrapper<Employee> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+        //根据名称模糊查询
+        lambdaQueryWrapper.like(StringUtils.isNotEmpty(employeePageQueryDTO.getName()),Employee::getName,employeePageQueryDTO.getName());
+
+        //构造排序条件
+        lambdaQueryWrapper.orderByAsc(Employee::getCreateTime);
+
+        //分页查询
+        employeeService.page(page,lambdaQueryWrapper);
+
+        return R.success(page);
+    }
+
+    /**
+     * 根据id查询员工（前端回显）
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<Employee> getById(@PathVariable Long id){
+        //根据id查询员工
+        Employee employee = employeeService.getById(id);
+
+        //将结果返回
+        if(employee != null){
+            return R.success(employee);
+        }else{
+            return R.error("员工信息查询失败");
+        }
+    }
+
+    @PutMapping
+    public R update(HttpServletRequest request,@RequestBody EmployeeDTO employeeDTO){
+        //创建员工对象，并拷贝前端传来的数据
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+
+        employeeService.updateById(employee);
+        return R.success("员工信息修改成功");
     }
 }

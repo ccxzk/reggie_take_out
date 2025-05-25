@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 @Data
 public class EmployeeDTO {
+    Long id;
+
     String name;
 
     String username;
@@ -16,5 +18,7 @@ public class EmployeeDTO {
     String sex;
 
     String idNumber;
+
+    Integer status;
 
 }
