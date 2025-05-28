@@ -139,6 +139,12 @@ public class EmployeeController {
         }
     }
 
+    /**
+     * 修改员工信息
+     * @param request
+     * @param employeeDTO
+     * @return
+     */
     @PutMapping
     public R update(HttpServletRequest request,@RequestBody EmployeeDTO employeeDTO){
         //创建员工对象，并拷贝前端传来的数据
