@@ -1,6 +1,8 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.CategoryDTO;
@@ -12,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("category")
@@ -87,6 +90,26 @@ public class CategoryController {
 
         categoryService.removeById(ids);
         return R.success("删除分类成功");
+    }
+
+    /**
+     * 根据id查询分类
+     * @param type
+     * @return
+     */
+    @GetMapping("/list")
+    public R list(@RequestParam int type){
+        //构造条件构造器
+        QueryWrapper<Category> queryWrapper = Wrappers.<Category>query()
+                .eq("type",type);
+
+        //根据分类类型查询
+        queryWrapper.eq("type",type);
+
+        //查询
+        List<Category> categories = categoryService.list(queryWrapper);
+
+        return R.success(categories);
     }
 
 

@@ -1,6 +1,8 @@
 server:
   port: 8080
 spring:
+  profiles:
+    active: dev
   application:
     #应用的名称，可选
     name: reggie_take_out
@@ -18,3 +20,9 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: ASSIGN_ID
+reggie:
+  alioss:
+    endpoint: ${reggie.alioss.endpoint}
+    access-key-id: ${reggie.alioss.access-key-id}
+    access-key-secret: ${reggie.alioss.access-key-secret}
+    bucket-name: ${reggie.alioss.bucket-name}
