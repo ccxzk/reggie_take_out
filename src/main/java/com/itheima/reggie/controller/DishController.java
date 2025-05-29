@@ -10,7 +10,9 @@ import com.itheima.reggie.dto.DishDTO;
 import com.itheima.reggie.dto.DishPageQueryDTO;
 import com.itheima.reggie.entity.Category;
 import com.itheima.reggie.entity.Dish;
+import com.itheima.reggie.entity.DishFlavor;
 import com.itheima.reggie.service.CategoryService;
+import com.itheima.reggie.service.DishFlavorService;
 import com.itheima.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -26,6 +28,9 @@ import java.util.List;
 public class DishController {
     @Resource
     private DishService dishService;
+
+    @Resource
+    private DishFlavorService dishFlavorService;
 
     @Resource
     private CategoryService categoryService;
@@ -48,7 +53,7 @@ public class DishController {
         LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
 
         lambdaQueryWrapper.like(StringUtils.isNotEmpty(dishPageQueryDTO.getName()),Dish::getName,dishPageQueryDTO.getName()); // 添加过滤条件
-        lambdaQueryWrapper.orderByAsc(Dish::getCreateTime); // 添加排序条件
+        lambdaQueryWrapper.orderByDesc(Dish::getCreateTime); // 添加排序条件
 
         //分页查询
         dishService.page(page,lambdaQueryWrapper);
@@ -68,14 +73,72 @@ public class DishController {
     public R save(@RequestBody DishDTO dishDTO){
         log.info("菜品信息：{}",dishDTO);
 
-        //创建菜品对象，并拷贝前端传来的数据
-        Dish dish = new Dish();
-        BeanUtils.copyProperties(dishDTO,dish);
-
-        dishService.save(dish);
+        dishService.saveWithFlavor(dishDTO);
 
         return R.success("新增菜品成功");
     }
+
+    /**
+     * 根据id查询菜品
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R getById(@PathVariable Long id){
+        Dish dish = dishService.getById(id);
+
+        DishDTO dishDTO = new DishDTO();
+        BeanUtils.copyProperties(dish,dishDTO);
+        return R.success(dishDTO);
+    }
+
+    /**
+     * 修改菜品
+     * @param dishDTO
+     * @return
+     */
+    @PutMapping
+    public R update(@RequestBody DishDTO dishDTO){
+        log.info("修改菜品信息：{}", dishDTO);
+
+        dishService.updateWithFlavor(dishDTO);
+
+        return R.success("菜品信息修改成功");
+    }
+
+    /**
+     * 批量删除菜品
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R delete(@RequestParam List<Long> ids){
+
+        //先删除菜品口味
+        LambdaQueryWrapper<DishFlavor> queryWrapper = Wrappers.<DishFlavor>lambdaQuery()
+                .in(DishFlavor::getDishId, ids); // 修改为 in 条件
+
+        dishFlavorService.remove(queryWrapper);
+
+        // 再删除菜品表数据
+        dishService.removeByIds(ids);
+        return R.success("菜品删除成功");
+    }
+
+    /**
+     * 批量起售停售
+     * @param status
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public R startOrStop(@PathVariable Integer status,
+                          @RequestParam List<Long> ids){
+        dishService.updateStatusByIds(status, ids);
+        return R.success("状态修改成功");
+    }
+
+
 
 
 

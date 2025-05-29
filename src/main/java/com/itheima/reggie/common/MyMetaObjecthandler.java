@@ -25,12 +25,6 @@ public class MyMetaObjecthandler implements MetaObjectHandler {
         metaObject.setValue("updateTime",LocalDateTime.now());
         metaObject.setValue("createUser",BaseContext.getCurrentId());
         metaObject.setValue("updateUser",BaseContext.getCurrentId());
-
-        //默认状态为起售
-        Integer currentStatus = (Integer) getFieldValByName("status", metaObject);
-        if (currentStatus == null || currentStatus == 0) {
-            metaObject.setValue("status", MessageConstant.ENABLED);
-        }
     }
 
     /**

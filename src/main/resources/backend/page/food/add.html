@@ -344,7 +344,7 @@
                 console.log('this.dishFlavors',this.dishFlavors)
                 // this.ruleForm.id = res.data.data.categoryId
                 // this.imageUrl = res.data.data.image
-                this.imageUrl = `/common/download?name=${res.data.image}`
+                this.imageUrl = res.data
               } else {
                 this.$message.error(res.msg || '操作失败')
               }
@@ -506,12 +506,14 @@
           },
 
           handleAvatarSuccess (response, file, fileList) {
-            // 拼接down接口预览
-            if(response.code === 0 && response.msg === '未登录'){
-              window.top.location.href = '/backend/page/login/login.html'
-            }else{
-              this.imageUrl = `/common/download?name=${response.data}`
-              this.ruleForm.image = response.data
+            if(response.code === 1) { // 修改判断条件
+              this.imageUrl = response.data;
+              this.ruleForm.image = response.data;
+            } else {
+              this.$message.error(response.msg || '上传失败');
+              if(response.msg === '未登录'){
+                window.top.location.href = '/backend/page/login/login.html'
+              }
             }
           },
 
