@@ -87,8 +87,14 @@ public class DishController {
     public R getById(@PathVariable Long id){
         Dish dish = dishService.getById(id);
 
+        LambdaQueryWrapper<DishFlavor> queryWrapper = Wrappers.<DishFlavor>lambdaQuery()
+                .eq(DishFlavor::getDishId,id);
+
+
         DishDTO dishDTO = new DishDTO();
+        dishDTO.setFlavors(dishFlavorService.list(queryWrapper));
         BeanUtils.copyProperties(dish,dishDTO);
+
         return R.success(dishDTO);
     }
 
@@ -133,9 +139,27 @@ public class DishController {
      */
     @PostMapping("/status/{status}")
     public R startOrStop(@PathVariable Integer status,
-                          @RequestParam List<Long> ids){
+                         @RequestParam List<Long> ids){
         dishService.updateStatusByIds(status, ids);
         return R.success("状态修改成功");
+    }
+
+    /**
+     * 获取菜品列表
+     * @param categoryId
+     * @param name
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Dish>> list(@RequestParam(required = false) Long categoryId,
+                              @RequestParam(required = false) String name
+    ){
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = Wrappers.<Dish>lambdaQuery()
+                .like(StringUtils.isNotEmpty(name),  Dish::getName, name)
+                .eq(categoryId != null, Dish::getCategoryId, categoryId);
+
+        List<Dish> list = dishService.list(lambdaQueryWrapper);
+        return R.success(list);
     }
 
 
