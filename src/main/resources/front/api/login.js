@@ -1,10 +1,11 @@
-function loginApi(data) {
-    return $axios({
-      'url': '/user/login',
-      'method': 'post',
-      data
+// 登录
+export function loginApi(data) {
+    return request({
+        url: '/user/loginByEmail',
+        method: 'post',
+        data
     })
-  }
+}
 
 function loginoutApi() {
   return $axios({

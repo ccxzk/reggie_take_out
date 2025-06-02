@@ -12,6 +12,29 @@ spring:
       url: jdbc:mysql://localhost:3306/db_reggie
       username: root
       password: asd213..+-
+  redis:
+    host: ${reggie.redis.host}
+    port: ${reggie.redis.port}
+    database: ${reggie.redis.database}
+
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: ${reggie.mail.username}
+    password: ${reggie.mail.password}
+    properties:
+      mail:
+        #配置SSL 加密工厂
+        smtp:
+          ssl:
+            #本地测试，先放开ssl
+            enable: true
+          #开启debug模式，这样邮件发送过程的日志会在控制台打印出来，方便排查错误
+        debug: true
+        socketFactory:
+          class: javax.net.ssl.SSLSocketFactory
+
+
 mybatis-plus:
   configuration:
     #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
@@ -20,6 +43,7 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: ASSIGN_ID
+
 reggie:
   alioss:
     endpoint: ${reggie.alioss.endpoint}
