@@ -98,13 +98,11 @@ public class CategoryController {
      * @return
      */
     @GetMapping("/list")
-    public R list(@RequestParam int type){
+    public R<List<Category>> list(@RequestParam(required = false) Integer type){
         //构造条件构造器
         QueryWrapper<Category> queryWrapper = Wrappers.<Category>query()
-                .eq("type",type);
-
-        //根据分类类型查询
-        queryWrapper.eq("type",type);
+                .eq(type != null, "type", type)
+                .orderByAsc("update_time");
 
         //查询
         List<Category> categories = categoryService.list(queryWrapper);

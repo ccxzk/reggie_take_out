@@ -144,4 +144,20 @@ public class SetmealController {
         return R.success("删除成功");
     }
 
+    /**
+     *   根据id、status查询套餐
+     * @param setmeal
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list( Setmeal setmeal) {
+        LambdaQueryWrapper<Setmeal> queryWrapper = Wrappers.<Setmeal>lambdaQuery()
+                .eq(Setmeal::getCategoryId,setmeal.getCategoryId())
+                .eq(Setmeal::getStatus,1)
+                .orderByDesc(Setmeal::getUpdateTime);
+
+        List<Setmeal> list = setmealService.list(queryWrapper);
+        return R.success(list);
+    }
+
 }

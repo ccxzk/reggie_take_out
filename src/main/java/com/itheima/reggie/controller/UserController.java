@@ -4,6 +4,7 @@ import com.itheima.reggie.common.R;
 import com.itheima.reggie.constant.MailConstant;
 import com.itheima.reggie.constant.MessageConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,16 +71,21 @@ public class UserController {
 
     @PostMapping("/login")
     public R<String> login(@RequestParam String email,
-                           @RequestParam String code) {
+                           @RequestParam String code,
+                           HttpServletRequest request) {
         log.info("收到邮箱登录请求，邮箱地址：{}，验证码：{}", email, code);
 
         // 校验验证码
         Object storedCodeObj = redisTemplate.opsForValue().get(email);
         String storedCode = storedCodeObj != null ? storedCodeObj.toString() : null;
 
+        //登录失败
         if (storedCode == null || !storedCode.equals(code)) {
             return R.error(MessageConstant.EMAIL_ERROR);
         }
+
+        //将登录成功用户id存入session
+        request.getSession().setAttribute("user", email);
 
         return R.success("登录成功");
     }
